@@ -35,4 +35,44 @@ class Barang_model extends CI_Model {
             ]);
         }
     }
+
+    public function get_barang_by_id($id) {
+    return $this->db->get_where('barang', ['id_barang' => $id])->row_array();
+}
+
+public function update_stok_pembelian($id, $stok_baru, $harga_beli, $harga_jual) {
+    $this->db->where('id_barang', $id)->update('barang', [
+        'stok'       => $stok_baru,
+        'harga_beli' => $harga_beli,
+        'harga_jual' => $harga_jual,
+    ]);
+}
+
+public function update_harga($id, $harga_beli, $harga_jual) {
+    $this->db->where('id_barang', $id)->update('barang', [
+        'harga_beli' => $harga_beli,
+        'harga_jual' => $harga_jual,
+    ]);
+}
+
+public function catat_tambah_stok($id, $jumlah, $harga_beli, $tanggal) {
+    $this->db->insert('tambah_stok', [
+        'id_barang'    => $id,
+        'jumlah_tambah' => $jumlah,
+        'harga_beli'   => $harga_beli,
+        'tanggal'      => $tanggal,
+    ]);
+}
+
+public function catat_history_stok($id, $jumlah, $stok_sebelum, $stok_sesudah, $keterangan, $tanggal) {
+    $this->db->insert('history_stok', [
+        'id_barang'    => $id,
+        'jenis'        => 'tambah',
+        'jumlah'       => $jumlah,
+        'stok_sebelum' => $stok_sebelum,
+        'stok_sesudah' => $stok_sesudah,
+        'keterangan'   => $keterangan,
+        'tanggal'      => $tanggal,
+    ]);
+}
 }

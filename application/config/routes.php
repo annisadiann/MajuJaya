@@ -64,3 +64,5 @@ $route['stok/history/(:num)'] = 'stok/history/$1';
 $route['pembelian'] = 'pembelian/index';
 $route['barang/tambah'] = 'barang/tambah';
 $route['barang/simpan'] = 'barang/simpan';
+$route['barang/proses_penjualan'] = 'barang/proses_penjualan';
+$route['barang/simpan_pembelian'] = 'barang/simpan_pembelian';
