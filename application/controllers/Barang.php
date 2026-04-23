@@ -75,7 +75,6 @@ class Barang extends CI_Controller {
         redirect('barang?tab=penjualan');
     }
 
-    // Cek stok
     foreach ($jumlah_beli as $id => $jumlah) {
         $barang = $this->Barang_model->get_barang_by_id($id);
         if ($jumlah > $barang['stok']) {
@@ -117,7 +116,6 @@ class Barang extends CI_Controller {
             $harga_beli_final = $harga_beli_baru ?? (int)$barang['harga_beli'];
             $harga_jual_final = $harga_jual_baru ?? (int)$barang['harga_jual'];
 
-            // Validasi harga jual > harga beli
             if ($harga_jual_baru !== null && $harga_jual_baru <= $harga_beli_final) {
                 $this->session->set_flashdata('error', 'Harga jual harus lebih besar dari harga beli!');
                 redirect('barang?tab=pembelian');
