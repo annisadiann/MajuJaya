@@ -6,7 +6,7 @@ class Stok extends CI_Controller {
     public function __construct() {
         parent::__construct();
         $this->load->model('Stok_model');
-        cek_admin(); // hanya admin
+        cek_admin(); 
     }
 
     public function index() {

@@ -40,7 +40,6 @@ class Barang extends CI_Controller {
         $harga_jual  = (int)$this->input->post('harga_jual');
         $jumlah_stok = (int)$this->input->post('jumlah');
 
-        // Validasi
         if ($harga_jual <= $harga_beli) {
             $this->session->set_flashdata('error', 'Harga jual harus lebih besar dari harga beli!');
             redirect('barang/tambah');

@@ -140,7 +140,6 @@
   </div>
 </div>
 
-<!-- Popup Detail -->
 <div id="popup-detail" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:999;">
   <div style="background:white; border-radius:10px; padding:30px; max-width:500px; margin:100px auto; box-shadow:0 5px 20px rgba(0,0,0,0.3);">
     <h3 style="color:#2c3e50; margin-bottom:15px;">Detail Transaksi</h3>
@@ -159,7 +158,6 @@
   </div>
 </div>
 
-<!-- Popup Retur -->
 <div id="popup-retur" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:999;">
   <div style="background:white; border-radius:10px; padding:30px; max-width:400px; margin:100px auto; box-shadow:0 5px 20px rgba(0,0,0,0.3);">
     <h3 style="color:#2c3e50; margin-bottom:15px;">Form Retur</h3>

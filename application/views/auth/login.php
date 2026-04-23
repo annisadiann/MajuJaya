@@ -9,7 +9,6 @@
     
     body { 
       font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      /* Gambar Background FIX: Rak Peralatan Tulis & Kantor */
       background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), 
                   url('https://images.unsplash.com/photo-1568205612837-017257d2310a?q=80&w=2000&auto=format&fit=crop'); 
       background-size: cover;
@@ -21,12 +20,11 @@
       min-height: 100vh; 
     }
 
-    /* Efek Form Login "Clear" (Glassmorphism) */
     .card { 
-      background: rgba(255, 255, 255, 0.1); /* Transparansi murni */
-      backdrop-filter: blur(25px); /* Efek blur kaca */
+      background: rgba(255, 255, 255, 0.1); 
+      backdrop-filter: blur(25px); 
       -webkit-backdrop-filter: blur(25px);
-      border: 1px solid rgba(255, 255, 255, 0.3); /* Border tipis seperti kaca */
+      border: 1px solid rgba(255, 255, 255, 0.3); 
       border-radius: 25px; 
       padding: 50px 40px; 
       width: 400px; 
@@ -71,7 +69,7 @@
     input[type=text], input[type=password] { 
       width: 100%; 
       padding: 14px 18px; 
-      background: rgba(255, 255, 255, 0.2); /* Input bening */
+      background: rgba(255, 255, 255, 0.2); 
       border: 1px solid rgba(255, 255, 255, 0.2); 
       border-radius: 12px; 
       font-size: 14px; 

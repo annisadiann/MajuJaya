@@ -8,7 +8,6 @@ class Auth_model extends CI_Model {
         $query = $this->db->get('users');
         $user  = $query->row_array();
 
-        // Cek password bcrypt
         if ($user && password_verify($password, $user['password'])) {
             return $user;
         }

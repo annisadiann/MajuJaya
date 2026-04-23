@@ -6,7 +6,7 @@ class Pembelian extends CI_Controller {
     public function __construct() {
         parent::__construct();
         $this->load->model('Pembelian_model');
-        cek_admin(); // hanya admin
+        cek_admin(); 
     }
 
     public function index() {

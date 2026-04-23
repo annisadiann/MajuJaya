@@ -19,13 +19,11 @@ class Kasir_model extends CI_Model {
         $tanggal  = date('Y-m-d H:i:s');
         $hari_ini = date('Y-m-d');
 
-        // Generate no transaksi
         $urutan = $this->db
             ->where("DATE(tanggal)", $hari_ini)
             ->count_all_results('transaksi') + 1;
         $no_transaksi = date('d/m/Y') . '-' . str_pad($urutan, 2, '0', STR_PAD_LEFT);
 
-        // Hitung total & kumpulkan detail
         $total_harga   = 0;
         $detail_barang = [];
 
@@ -45,7 +43,6 @@ class Kasir_model extends CI_Model {
             ];
         }
 
-        // Insert transaksi
         $this->db->insert('transaksi', [
             'no_transaksi' => $no_transaksi,
             'tanggal'      => $tanggal,
@@ -53,7 +50,6 @@ class Kasir_model extends CI_Model {
             'total_harga'  => $total_harga,
         ]);
 
-        // Insert detail & update stok
         foreach ($detail_barang as $item) {
             $this->db->insert('detail_transaksi', [
                 'no_transaksi' => $no_transaksi,

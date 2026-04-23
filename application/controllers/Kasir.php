@@ -7,7 +7,6 @@ class Kasir extends CI_Controller {
     parent::__construct();
     $this->load->model('Kasir_model');
     cek_login();
-    // Kalau admin/superadmin coba akses kasir, redirect ke barang
     $role = $this->session->userdata('role');
     if ($role === 'superadmin' || $role === 'admin') {
         redirect('barang');
@@ -44,7 +43,6 @@ class Kasir extends CI_Controller {
             redirect('kasir');
         }
 
-        // Cek stok semua barang dulu sebelum proses
         foreach ($jumlah_beli as $id => $jumlah) {
             $barang = $this->Kasir_model->get_barang_by_id($id);
             if ($jumlah > $barang['stok']) {
@@ -53,7 +51,6 @@ class Kasir extends CI_Controller {
             }
         }
 
-        // Proses transaksi
         $result = $this->Kasir_model->simpan_transaksi($jumlah_beli);
 
         $this->load->view('kasir_sukses_view', [

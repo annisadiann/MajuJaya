@@ -50,20 +50,17 @@ class Riwayat extends CI_Controller {
         $jumlah_beli  = (int)$this->input->post('jumlah_beli');
         $tanggal_beli = $this->input->post('tanggal_beli');
 
-        // Validasi masa berlaku retur (max 1 hari)
         $batas = date('Y-m-d', strtotime($tanggal_beli . ' +1 day'));
         if (date('Y-m-d') > $batas) {
             $this->session->set_flashdata('error', 'Batas waktu retur sudah lewat!');
             redirect('riwayat');
         }
 
-        // Validasi jumlah retur
         if ($jumlah_retur > $jumlah_beli) {
             $this->session->set_flashdata('error', 'Jumlah retur melebihi jumlah beli!');
             redirect('riwayat');
         }
 
-        // Cek total retur sebelumnya
         $sudah_retur = $this->Riwayat_model->get_total_retur($no_transaksi, $nama_barang);
         if (($sudah_retur + $jumlah_retur) > $jumlah_beli) {
             $this->session->set_flashdata('error', 'Total retur melebihi jumlah beli!');

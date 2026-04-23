@@ -57,7 +57,6 @@
 <body>
 <div class="container">
 
-  <!-- Header user info -->
   <div style="display:flex; justify-content:flex-end; align-items:center; gap:10px; margin-bottom:10px;">
     <div style="background:#f0f2f5; border:1px solid #dde; border-radius:20px; padding:6px 14px; font-size:13px; color:#555;">
       <strong style="color:#2c3e50;"><?= htmlspecialchars($nama) ?></strong>
@@ -85,7 +84,6 @@
     <button class="tab-btn penjualan" onclick="gantiTab('penjualan')">Penjualan ke Pelanggan</button>
   </div>
 
-  <!-- TAB PEMBELIAN -->
   <div id="tab-pembelian">
     <div class="info-banner">
       Isi <strong>Jumlah Dibeli</strong> untuk menampilkan input harga. Kosongkan harga jika tidak ada perubahan.
@@ -147,7 +145,6 @@
     </form>
   </div>
 
-  <!-- TAB PENJUALAN -->
   <div id="tab-penjualan" style="display:none;">
     <form action="<?= site_url('barang/proses_penjualan') ?>" method="POST">
     <table>
@@ -184,7 +181,6 @@
     </form>
   </div>
 
-  <!-- PAGINATION -->
   <?php if ($totalHalaman > 1): ?>
   <div class="pagination">
     <?php if ($page > 1): ?>
@@ -200,7 +196,6 @@
   <span style="color:#888; font-size:13px; margin-top:8px; display:block;">Halaman <?= $page ?> dari <?= $totalHalaman ?></span>
   <?php endif; ?>
 
-  <!-- POPUP HAPUS -->
   <div id="popup-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:999;">
     <div style="background:white; border-radius:10px; padding:30px; max-width:400px; margin:150px auto; text-align:center; box-shadow:0 5px 20px rgba(0,0,0,0.3);">
       <h3 style="color:#2c3e50; margin-bottom:10px;">Hapus Barang?</h3>

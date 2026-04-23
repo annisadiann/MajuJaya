@@ -23,7 +23,6 @@ class Riwayat_model extends CI_Model {
             "SELECT * FROM transaksi WHERE $where ORDER BY tanggal DESC LIMIT $limit OFFSET $offset"
         )->result_array();
 
-        // Tambahkan info retur tiap transaksi
         foreach ($rows as &$row) {
             $no  = $row['no_transaksi'];
             $tgl = $row['tanggal'];
@@ -94,13 +93,11 @@ class Riwayat_model extends CI_Model {
         $tanggal_retur = date('Y-m-d H:i:s');
         $hari_ini      = date('Y-m-d');
 
-        // Generate no retur
         $urutan = $this->db->query(
             "SELECT COUNT(*) as total FROM retur WHERE DATE(tanggal_retur) = '$hari_ini'"
         )->row_array()['total'] + 1;
         $no_retur = 'RTR-' . date('d/m/Y') . '-' . str_pad($urutan, 2, '0', STR_PAD_LEFT);
 
-        // Insert retur
         $this->db->insert('retur', [
             'no_retur'      => $no_retur,
             'no_transaksi'  => $no_transaksi,
@@ -111,7 +108,6 @@ class Riwayat_model extends CI_Model {
             'total_retur'   => $total_retur,
         ]);
 
-        // Update stok barang
         $barang = $this->db->get_where('barang', ['nama_barang' => $nama_barang])->row_array();
         $stok_sebelum = $barang['stok'];
         $stok_sesudah = $stok_sebelum + $jumlah_retur;
@@ -120,7 +116,6 @@ class Riwayat_model extends CI_Model {
                  ->set('stok', 'stok + ' . $jumlah_retur, FALSE)
                  ->update('barang');
 
-        // Catat history stok
         $this->db->insert('history_stok', [
             'id_barang'    => $barang['id_barang'],
             'jenis'        => 'tambah',
