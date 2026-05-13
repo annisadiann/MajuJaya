@@ -36,7 +36,7 @@
     <p>Total Pembayaran:</p>
     <div class="total">Rp <?= number_format($total_harga, 0, ',', '.') ?></div>
     <br>
-    <a class="btn btn-green" href="<?= site_url('kasir') ?>">Jual Lagi</a>
+    <a class="btn btn-green" href="<?= site_url($this->session->userdata('role') === 'kasir' ? 'kasir' : 'barang?tab=penjualan') ?>">Jual Lagi</a>
     <a class="btn btn-blue"  href="<?= site_url('riwayat') ?>">Lihat Riwayat</a>
     <a class="btn btn-blue"  href="<?= site_url('invoice?no='.urlencode($no_transaksi)) ?>">Cetak Invoice</a>
   </div>

@@ -26,7 +26,7 @@
       <div class="error"><?= htmlspecialchars($error) ?></div>
     <?php endif; ?>
 
-    <form action="<?= site_url('barang/simpan') ?>" method="POST">
+    <form action="<?= site_url('barang/simpan') ?>" method="POST" id="form-tambah">
 
       <label>Nama Barang</label>
       <input type="text" name="nama_barang" placeholder="Contoh: Buku Tulis" required>
@@ -34,19 +34,66 @@
       <hr class="divider">
 
       <label>Harga Beli <span class="hint">(harga dari supplier)</span></label>
-      <input type="number" name="harga_beli" min="0" placeholder="Contoh: 4500" required>
+      <input type="text" inputmode="numeric" id="harga_beli_display" placeholder="Contoh: 4.500" required>
+      <input type="hidden" name="harga_beli" id="harga_beli">
 
       <label>Harga Jual <span class="hint">(harga ke customer)</span></label>
-      <input type="number" name="harga_jual" min="0" placeholder="Contoh: 6000" required>
+      <input type="text" inputmode="numeric" id="harga_jual_display" placeholder="Contoh: 6.000" required>
+      <input type="hidden" name="harga_jual" id="harga_jual">
 
       <hr class="divider">
 
       <label>Jumlah Stok Awal</label>
-      <input type="number" name="jumlah" min="0" placeholder="Contoh: 30" required>
+      <input type="text" inputmode="numeric" id="jumlah_display" placeholder="Contoh: 30" required>
+      <input type="hidden" name="jumlah" id="jumlah">
 
       <button type="submit" class="btn-simpan">Simpan Barang</button>
     </form>
     <a class="link-back" href="<?= site_url('barang') ?>">← Kembali ke Daftar Barang</a>
   </div>
+
+  <script>
+    function formatInput(input, hiddenId) {
+      let raw = input.value.replace(/\./g, '').replace(/[^0-9]/g, '');
+
+      if (raw.length > 1 && raw[0] === '0') {
+        raw = raw.replace(/^0+/, '') || '0';
+      }
+
+      document.getElementById(hiddenId).value = raw;
+      input.value = raw ? parseInt(raw).toLocaleString('id-ID') : '';
+    }
+
+    document.getElementById('harga_beli_display').addEventListener('input', function() {
+      formatInput(this, 'harga_beli');
+    });
+
+    document.getElementById('harga_jual_display').addEventListener('input', function() {
+      formatInput(this, 'harga_jual');
+    });
+
+    document.getElementById('jumlah_display').addEventListener('input', function() {
+      formatInput(this, 'jumlah');
+    });
+
+    document.getElementById('form-tambah').addEventListener('submit', function(e) {
+      const hargaBeli = parseInt(document.getElementById('harga_beli').value) || 0;
+      const hargaJual = parseInt(document.getElementById('harga_jual').value) || 0;
+      const jumlah    = document.getElementById('jumlah').value;
+
+      if (hargaBeli <= 0) {
+        alert('Harga beli harus diisi!');
+        e.preventDefault(); return;
+      }
+      if (hargaJual <= 0) {
+        alert('Harga jual harus diisi!');
+        e.preventDefault(); return;
+      }
+      if (jumlah === '') {
+        alert('Jumlah stok harus diisi!');
+        e.preventDefault(); return;
+      }
+    });
+  </script>
 </body>
 </html>

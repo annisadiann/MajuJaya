@@ -123,7 +123,6 @@
   <h2>MAJU JAYA</h2>
   <p class="subtitle">Pusat Alat Tulis Kantor & Sekolah</p>
 
-  <!-- Login Logic CodeIgniter Kamu -->
   <form action="/MajuJaya/index.php/auth/proses_login" method="POST">
     <div class="input-group">
         <label>Username</label>
@@ -135,7 +134,7 @@
         <input type="password" name="password" placeholder="Masukkan password" required>
     </div>
 
-    <button type="submit">LOGIN SYSTEM</button>
+    <button type="submit">LOGIN SISTEM</button>
   </form>
 
   <div class="footer-text">

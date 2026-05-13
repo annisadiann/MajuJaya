@@ -60,7 +60,7 @@
     <tr>
       <td><?= htmlspecialchars($row['nama_barang']) ?></td>
       <td style="text-align:center;">Rp <?= number_format($row['harga_jual'], 0, ',', '.') ?></td>
-      <td style="text-align:center;" class="<?= $row['stok'] < 10 ? 'stok-low' : '' ?>"><?= $row['stok'] ?></td>
+      <td style="text-align:center;" class="<?= $row['stok'] < 10 ? 'stok-low' : '' ?>"><?= number_format($row['stok'], 0, ',', '.') ?></td>
       <td style="text-align:center;">
         <input type="number"
                name="jumlah[<?= $row['id_barang'] ?>]"

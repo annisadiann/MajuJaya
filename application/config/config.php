@@ -25,10 +25,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 */
 $config['base_url'] = $_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['HTTP_HOST'].'/MajuJaya/';
 
-$config['modules_locations'] = array(
-    APPPATH.'modules/' => '../modules/',
-);
-
 /*
 |--------------------------------------------------------------------------
 | Index File
@@ -229,7 +225,7 @@ $config['allow_get_array'] = TRUE;
 | your log files will fill up very fast.
 |
 */
-$config['log_threshold'] = 0;
+$config['log_threshold'] = 4;
 
 /*
 |--------------------------------------------------------------------------
@@ -413,8 +409,8 @@ $config['sess_regenerate_destroy'] = FALSE;
 |
 */
 $config['cookie_prefix']	= '';
-$config['cookie_domain']	= '';
-$config['cookie_path']		= '/';
+$config['cookie_domain']    = '';
+$config['cookie_path']      = '/';
 $config['cookie_secure']	= FALSE;
 $config['cookie_httponly'] 	= FALSE;
 $config['cookie_samesite'] 	= 'Lax';
@@ -501,7 +497,6 @@ $config['compress_output'] = FALSE;
 | helper' page of the user guide for information regarding date handling.
 |
 */
-$config['time_reference'] = 'local';
 
 /*
 |--------------------------------------------------------------------------
@@ -534,3 +529,5 @@ $config['rewrite_short_tags'] = FALSE;
 | Array:		array('10.0.1.200', '192.168.5.0/24')
 */
 $config['proxy_ips'] = '';
+
+$config['time_reference'] = 'local';

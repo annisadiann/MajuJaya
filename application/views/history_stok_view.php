@@ -25,7 +25,7 @@
 <div class="container">
   <h2>History Stok — <?= htmlspecialchars($barang['nama_barang']) ?></h2>
   <p class="subtitle">Riwayat lengkap perubahan stok masuk dan keluar</p>
-  <div class="stok-info">Stok saat ini: <strong><?= $barang['stok'] ?> unit</strong></div>
+  <div class="stok-info">Stok saat ini: <strong><?= number_format($barang['stok'], 0, ',', '.') ?> unit</strong></div>
 
   <?php if (empty($history)): ?>
     <p class="empty">Belum ada history untuk barang ini.</p>
@@ -53,9 +53,9 @@
             <span class="badge-kurang">▼ Kurang</span>
           <?php endif; ?>
         </td>
-        <td><?= $row['jumlah'] ?></td>
-        <td><?= $row['stok_sebelum'] ?></td>
-        <td><?= $row['stok_sesudah'] ?></td>
+        <td><?= number_format($row['jumlah'], 0, ',', '.') ?></td>
+        <td><?= number_format($row['stok_sebelum'], 0, ',', '.') ?></td>
+        <td><?= number_format($row['stok_sesudah'], 0, ',', '.') ?></td>
         <td><?= htmlspecialchars($row['keterangan'] ?: '-') ?></td>
         <td><?= htmlspecialchars($row['no_transaksi'] ?: '-') ?></td>
       </tr>

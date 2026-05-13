@@ -99,14 +99,35 @@
       </tr>
       <?php foreach ($rows as $idx => $row): ?>
       <tr id="row-<?= $idx ?>">
-        <td><?= htmlspecialchars($row['nama_barang']) ?></td>
+        <td>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <input type="text"
+                  id="nama-<?= $row['id_barang'] ?>"
+                  value="<?= htmlspecialchars($row['nama_barang']) ?>"
+                  data-asli="<?= htmlspecialchars($row['nama_barang']) ?>"
+                  oninput="cekPerubahan(this, <?= $row['id_barang'] ?>)"
+                  style="flex:1; padding:6px 8px; border:1px solid #ddd; border-radius:5px; font-size:14px;">
+            <input type="hidden" name="nama_barang[<?= $row['id_barang'] ?>]"
+              id="hidden-nama-<?= $row['id_barang'] ?>"
+              value="<?= htmlspecialchars($row['nama_barang']) ?>">
+            <button type="button"
+                  id="btn-simpan-nama-<?= $row['id_barang'] ?>"
+                  onclick="submitNama(<?= $row['id_barang'] ?>)"
+                  style="display:none; background:#27ae60; color:white; padding:5px 10px; border:none; border-radius:5px; cursor:pointer; font-size:12px; white-space:nowrap;">
+            ✓
+          </button>
+          </div>
+        </td>
         <td style="text-align:center;" class="<?= $row['stok'] < 10 ? 'stok-low' : '' ?>">
-          <?= $row['stok'] ?>
+          <?= number_format($row['stok'], 0, ',', '.') ?>
         </td>
         <td style="text-align:center;">
-          <input type="number" name="jumlah[<?= $row['id_barang'] ?>]"
-                 min="0" value="0" class="input-jumlah"
-                 data-idx="<?= $idx ?>" oninput="toggleHarga(this)">
+          <input type="text" inputmode="numeric"
+            name="jumlah[<?= $row['id_barang'] ?>]"
+            value="0"
+            class="input-jumlah input-format"
+            data-idx="<?= $idx ?>"
+            oninput="toggleHarga(this); formatInput(this)">
         </td>
         <td style="text-align:center;">
           <div class="harga-info">
@@ -118,22 +139,32 @@
             <div class="input-row">
               <div class="input-group">
                 <label>Harga Beli Baru</label>
-                <input type="number" name="harga_beli[<?= $row['id_barang'] ?>]"
-                       min="0" value="" placeholder="Kosongkan jika sama">
+                <input type="text" inputmode="numeric"
+                  name="harga_beli[<?= $row['id_barang'] ?>]"
+                  value="" placeholder="Kosongkan jika sama"
+                  class="input-format"
+                  oninput="formatInput(this)">
               </div>
               <div class="input-group">
                 <label>Harga Jual Baru</label>
-                <input type="number" name="harga_jual[<?= $row['id_barang'] ?>]"
-                       min="0" value="" placeholder="Kosongkan jika sama">
+                <input type="text" inputmode="numeric"
+                  name="harga_jual[<?= $row['id_barang'] ?>]"
+                  value="" placeholder="Kosongkan jika sama"
+                  class="input-format"
+                  oninput="formatInput(this)">
               </div>
             </div>
           </div>
         </td>
         <td style="text-align:center;">
-          <button type="button" class="btn-hapus"
-                  onclick="konfirmasiHapus(<?= $row['id_barang'] ?>, '<?= htmlspecialchars($row['nama_barang']) ?>')">
-            Hapus
-          </button>
+          <?php if ($row['stok'] == 0): ?>
+            <button type="button" class="btn-hapus"
+                    onclick="konfirmasiHapus(<?= $row['id_barang'] ?>, '<?= htmlspecialchars($row['nama_barang']) ?>')">
+              Hapus
+            </button>
+          <?php else: ?>
+            <span style="color:#aaa; font-size:12px;">Ada stok</span>
+          <?php endif; ?>
         </td>
       </tr>
       <?php endforeach; ?>
@@ -142,6 +173,10 @@
       <a class="link-riwayat" href="<?= site_url('pembelian') ?>">Lihat Riwayat Pembelian</a>
       <button type="submit" class="btn-simpan-beli">Simpan Pembelian</button>
     </div>
+    </form>
+    <form id="form-edit-nama" method="POST" action="<?= site_url('barang/edit_nama') ?>" style="display:none;">
+      <input type="hidden" name="id_barang" id="fn-id">
+      <input type="hidden" name="nama_barang" id="fn-nama">
     </form>
   </div>
 
@@ -159,7 +194,7 @@
       <tr>
         <td><?= htmlspecialchars($row['nama_barang']) ?></td>
         <td style="text-align:center;">Rp <?= number_format($row['harga_jual'], 0, ',', '.') ?></td>
-        <td style="text-align:center;" class="<?= $row['stok'] < 10 ? 'stok-low' : '' ?>"><?= $row['stok'] ?></td>
+        <td style="text-align:center;" class="<?= $row['stok'] < 10 ? 'stok-low' : '' ?>"><?= number_format($row['stok'], 0, ',', '.') ?></td>
         <td style="text-align:center;">
           <input type="number" name="jumlah[<?= $row['id_barang'] ?>]"
                  min="0" max="<?= $row['stok'] ?>" value="0"
@@ -182,17 +217,7 @@
   </div>
 
   <?php if ($totalHalaman > 1): ?>
-  <div class="pagination">
-    <?php if ($page > 1): ?>
-      <a href="?page=<?= $page-1 ?>">« Prev</a>
-    <?php endif; ?>
-    <?php for ($i = 1; $i <= $totalHalaman; $i++): ?>
-      <a href="?page=<?= $i ?>" class="<?= $i == $page ? 'active' : '' ?>"><?= $i ?></a>
-    <?php endfor; ?>
-    <?php if ($page < $totalHalaman): ?>
-      <a href="?page=<?= $page+1 ?>">Next »</a>
-    <?php endif; ?>
-  </div>
+  <div class="pagination" id="pagination"></div>
   <span style="color:#888; font-size:13px; margin-top:8px; display:block;">Halaman <?= $page ?> dari <?= $totalHalaman ?></span>
   <?php endif; ?>
 
@@ -210,48 +235,120 @@
 
 </div>
 <script>
-  function toggleHarga(input) {
-    const idx = input.dataset.idx;
-    const jumlah = parseInt(input.value) || 0;
-    const hargaEl = document.getElementById('harga-' + idx);
-    const row = document.getElementById('row-' + idx);
-    if (jumlah > 0) { hargaEl.classList.add('visible'); row.classList.add('row-aktif'); }
-    else { hargaEl.classList.remove('visible'); row.classList.remove('row-aktif'); }
+  function formatInput(input) {
+    let raw = input.value.replace(/\./g, '').replace(/[^0-9]/g, '');
+    if (raw === '' ) { input.value = ''; return; }
+    if (raw === '0') { input.value = '0'; return; }
+    input.value = parseInt(raw).toLocaleString('id-ID');
   }
+
+  function getRaw(input) {
+    return parseInt(input.value.replace(/\./g, '').replace(/[^0-9]/g, '')) || 0;
+  }
+
+  function toggleHarga(input) {
+    const idx     = input.dataset.idx;
+    const jumlah  = getRaw(input);
+    const hargaEl = document.getElementById('harga-' + idx);
+    const row     = document.getElementById('row-' + idx);
+    if (jumlah > 0) {
+      hargaEl.classList.add('visible');
+      row.classList.add('row-aktif');
+    } else {
+      hargaEl.classList.remove('visible');
+      row.classList.remove('row-aktif');
+    }
+  }
+
   function gantiTab(tab) {
     document.getElementById('tab-pembelian').style.display = tab === 'pembelian' ? 'block' : 'none';
     document.getElementById('tab-penjualan').style.display = tab === 'penjualan' ? 'block' : 'none';
     document.querySelector('.tab-btn.pembelian').classList.toggle('active', tab === 'pembelian');
     document.querySelector('.tab-btn.penjualan').classList.toggle('active', tab === 'penjualan');
+
+    const url = new URL(window.location.href);
+    url.searchParams.set('tab', tab);
+    window.history.replaceState({}, document.title, url.toString());
+
+    buildPagination();
   }
+
+  function buildPagination() {
+    const pagination = document.getElementById('pagination');
+    if (!pagination) return;
+    const tab  = new URLSearchParams(window.location.search).get('tab') || 'pembelian';
+    const page  = <?= $page ?>;
+    const total = <?= $totalHalaman ?>;
+    let html = '';
+    if (page > 1) html += `<a href="?page=${page-1}&tab=${tab}">« Prev</a>`;
+    for (let i = 1; i <= total; i++) {
+      html += `<a href="?page=${i}&tab=${tab}" class="${i == page ? 'active' : ''}">${i}</a>`;
+    }
+    if (page < total) html += `<a href="?page=${page+1}&tab=${tab}">Next »</a>`;
+    pagination.innerHTML = html;
+  }
+
   function hitungTotal() {
     let total = 0;
     document.querySelectorAll('.input-jual').forEach(function(input, i) {
-      const qty = parseInt(input.value) || 0;
+      const qty   = parseInt(input.value) || 0;
       const harga = parseInt(input.dataset.harga) || 0;
-      const sub = qty * harga;
+      const sub   = qty * harga;
       total += sub;
       const subEl = document.getElementById('sub-' + i);
       if (subEl) subEl.textContent = qty > 0 ? 'Rp ' + sub.toLocaleString('id-ID') : '-';
     });
     document.getElementById('total-display').textContent = 'Rp ' + total.toLocaleString('id-ID');
   }
+
   function konfirmasiHapus(id, nama) {
     document.getElementById('popup-id').value = id;
     document.getElementById('popup-nama').textContent = '"' + nama + '"';
     document.getElementById('popup-overlay').style.display = 'block';
   }
+
   function tutupPopup() {
     document.getElementById('popup-overlay').style.display = 'none';
   }
+
+  function cekPerubahan(input, id) {
+    const asli     = input.dataset.asli;
+    const baru     = input.value;
+    const btnEl    = document.getElementById('btn-simpan-nama-' + id);
+    const hiddenEl = document.getElementById('hidden-nama-' + id);
+    hiddenEl.value = baru;
+    if (baru.trim() !== asli.trim() && baru.trim() !== '') {
+      btnEl.style.display = 'inline-block';
+    } else {
+      btnEl.style.display = 'none';
+    }
+  }
+
   document.getElementById('popup-overlay').addEventListener('click', function(e) {
     if (e.target === this) tutupPopup();
   });
-  const urlParams = new URLSearchParams(window.location.search);
-  gantiTab(urlParams.get('tab') === 'penjualan' ? 'penjualan' : 'pembelian');
-  if (window.location.search.includes('success') || window.location.search.includes('error')) {
-    window.history.replaceState({}, document.title, window.location.pathname);
+
+  const formPembelian = document.querySelector('#tab-pembelian form');
+  if (formPembelian) {
+    formPembelian.addEventListener('submit', function() {
+      this.querySelectorAll('.input-format').forEach(function(input) {
+        let raw = input.value.replace(/\./g, '').replace(/[^0-9]/g, '');
+        if (raw !== '') input.value = raw;
+      });
+    });
   }
+
+  function submitNama(id) {
+    const nama = document.getElementById('nama-' + id).value.trim();
+    if (!nama) return;
+    document.getElementById('fn-id').value   = id;
+    document.getElementById('fn-nama').value = nama;
+    document.getElementById('form-edit-nama').submit();
+  }
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const activeTab = urlParams.get('tab') === 'penjualan' ? 'penjualan' : 'pembelian';
+  gantiTab(activeTab);
 </script>
 </body>
 </html>

@@ -22,8 +22,9 @@ class Riwayat_model extends CI_Model {
         $rows  = $this->db->query(
             "SELECT * FROM transaksi WHERE $where ORDER BY tanggal DESC LIMIT $limit OFFSET $offset"
         )->result_array();
-
-        foreach ($rows as &$row) {
+        
+        $result = [];
+        foreach ($rows as $row) {
             $no  = $row['no_transaksi'];
             $tgl = $row['tanggal'];
 
@@ -48,9 +49,10 @@ class Riwayat_model extends CI_Model {
 
             $row['bisa_retur']   = $bisa_retur;
             $row['masa_berlaku'] = $masa_berlaku;
+            $result[] = $row;
         }
 
-        return $rows;
+        return $result;
     }
 
     public function get_grand_total($dari, $sampai, $barang) {

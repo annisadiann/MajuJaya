@@ -4,14 +4,16 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Kasir extends CI_Controller {
 
     public function __construct() {
-    parent::__construct();
-    $this->load->model('Kasir_model');
-    cek_login();
-    $role = $this->session->userdata('role');
-    if ($role === 'superadmin' || $role === 'admin') {
-        redirect('barang');
+        parent::__construct();
+        $this->load->model('Kasir_model');
+        if (!$this->session->userdata('logged_in')) {
+            redirect('auth/login');
+        }
+        $role = $this->session->userdata('role');
+        if ($role === 'superadmin' || $role === 'admin') {
+            redirect('barang');
+        }
     }
-}
 
     public function index() {
         $limit  = 10;

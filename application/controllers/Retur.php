@@ -6,7 +6,9 @@ class Retur extends CI_Controller {
     public function __construct() {
         parent::__construct();
         $this->load->model('Retur_model');
-        cek_login();
+        if (!$this->session->userdata('logged_in')) {
+            redirect('auth/login');
+        }
     }
 
     public function index() {
@@ -17,7 +19,7 @@ class Retur extends CI_Controller {
         $page   = min($page, $total_hal);
         $offset = ($page - 1) * $limit;
 
-        $data['retur']      = $this->Retur_model->get_retur($limit, $offset);
+        $data['retur']       = $this->Retur_model->get_retur($limit, $offset);
         $data['grand_total'] = $this->Retur_model->get_grand_total();
         $data['total_data']  = $total;
         $data['total_hal']   = $total_hal;

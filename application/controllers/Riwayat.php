@@ -24,6 +24,9 @@ class Riwayat extends CI_Controller {
         $offset       = ($page - 1) * $limit;
 
         $data['transaksi']    = $this->Riwayat_model->get_transaksi($dari, $sampai, $barang, $limit, $offset);
+        // echo "<pre>";
+        // print_r($data['transaksi']);
+        // die;
         $data['grand_total']  = $this->Riwayat_model->get_grand_total($dari, $sampai, $barang);
         $data['total_data']   = $total;
         $data['total_hal']    = $total_hal;
@@ -33,6 +36,7 @@ class Riwayat extends CI_Controller {
         $data['barang']       = $barang;
         $data['daftar_barang'] = $this->Riwayat_model->get_daftar_barang();
         $data['detail_all']   = $this->Riwayat_model->get_all_detail();
+
         $data['error']        = $this->session->flashdata('error');
 
         $this->load->view('riwayat_view', $data);
