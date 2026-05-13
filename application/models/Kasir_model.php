@@ -15,7 +15,7 @@ class Kasir_model extends CI_Model {
         return $this->db->get_where('barang', ['id_barang' => $id])->row_array();
     }
 
-    public function simpan_transaksi($jumlah_beli) {
+    public function simpan_transaksi($jumlah_beli, $id_pelanggan = null) {
         $tanggal  = date('Y-m-d H:i:s');
         $hari_ini = date('Y-m-d');
 
@@ -48,6 +48,7 @@ class Kasir_model extends CI_Model {
             'tanggal'      => $tanggal,
             'jumlah'       => count($jumlah_beli),
             'total_harga'  => $total_harga,
+            'id_pelanggan' => $id_pelanggan,  // ← tambahan
         ]);
 
         foreach ($detail_barang as $item) {
@@ -60,8 +61,8 @@ class Kasir_model extends CI_Model {
             ]);
 
             $this->db->where('id_barang', $item['id_barang'])
-                     ->set('stok', 'stok - ' . $item['jumlah'], FALSE)
-                     ->update('barang');
+                    ->set('stok', 'stok - ' . $item['jumlah'], FALSE)
+                    ->update('barang');
 
             $this->db->insert('history_stok', [
                 'id_barang'    => $item['id_barang'],
@@ -76,5 +77,17 @@ class Kasir_model extends CI_Model {
         }
 
         return compact('no_transaksi', 'detail_barang', 'total_harga');
+    }
+
+    public function search_barang($keyword) {
+        $keywords = array_filter(explode(' ', $keyword));
+        $this->db->group_start();
+        foreach ($keywords as $k) {
+            $this->db->or_like('nama_barang', $k);
+        }
+        $this->db->group_end();
+        return $this->db->order_by('nama_barang', 'ASC')
+                        ->get('barang')
+                        ->result_array();
     }
 }

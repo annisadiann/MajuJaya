@@ -206,9 +206,43 @@
       </tr>
       <?php endforeach; ?>
     </table>
+
     <div class="total-box">
       Total Transaksi: <span id="total-display">Rp 0</span>
     </div>
+
+    <div style="background:#f8f9fa; border:1px solid #ddd; border-radius:8px; padding:15px 20px; margin-top:15px;">
+      <label style="font-size:13px; font-weight:bold; color:#555; display:block; margin-bottom:8px;">Pelanggan</label>
+      <div style="display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap;">
+        <div>
+          <label style="font-size:12px; color:#666; display:block; margin-bottom:4px;">Pilih Pelanggan</label>
+          <select name="id_pelanggan" id="select-pelanggan" style="padding:7px 10px; border:1px solid #ddd; border-radius:5px; font-size:13px; min-width:220px;" onchange="toggleFormPelanggan(this)">
+            <option value="">-- Tanpa Pelanggan --</option>
+            <option value="baru">+ Tambah Pelanggan Baru</option>
+            <?php foreach ($daftar_pelanggan as $p): ?>
+              <option value="<?= $p['id_pelanggan'] ?>">
+                <?= htmlspecialchars($p['kode_pelanggan'].' - '.$p['nama_pelanggan']) ?>
+              </option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+      </div>
+      <div id="form-pelanggan-baru" style="display:none; margin-top:12px; padding-top:12px; border-top:1px solid #eee;">
+        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+          <div>
+            <label style="font-size:12px; color:#666; display:block; margin-bottom:4px;">Nama Pelanggan</label>
+            <input type="text" name="nama_pelanggan_baru" placeholder="Nama pelanggan..."
+              style="padding:7px 10px; border:1px solid #ddd; border-radius:5px; font-size:13px; width:200px;">
+          </div>
+          <div>
+            <label style="font-size:12px; color:#666; display:block; margin-bottom:4px;">Alamat (opsional)</label>
+            <input type="text" name="alamat_baru" placeholder="Alamat..."
+              style="padding:7px 10px; border:1px solid #ddd; border-radius:5px; font-size:13px; width:200px;">
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="footer-bar">
       <a class="link-riwayat" href="<?= site_url('riwayat') ?>">Lihat Riwayat Transaksi</a>
       <button type="submit" class="btn-proses-jual">Proses Penjualan</button>
@@ -344,6 +378,11 @@
     document.getElementById('fn-id').value   = id;
     document.getElementById('fn-nama').value = nama;
     document.getElementById('form-edit-nama').submit();
+  }
+
+  function toggleFormPelanggan(select) {
+    const form = document.getElementById('form-pelanggan-baru');
+    form.style.display = select.value === 'baru' ? 'block' : 'none';
   }
 
   const urlParams = new URLSearchParams(window.location.search);

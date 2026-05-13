@@ -20,7 +20,10 @@ class Riwayat_model extends CI_Model {
     public function get_transaksi($dari, $sampai, $barang, $limit, $offset) {
         $where = $this->build_where($dari, $sampai, $barang);
         $rows  = $this->db->query(
-            "SELECT * FROM transaksi WHERE $where ORDER BY tanggal DESC LIMIT $limit OFFSET $offset"
+            "SELECT t.*, p.nama_pelanggan, p.kode_pelanggan
+            FROM transaksi t
+            LEFT JOIN pelanggan p ON t.id_pelanggan = p.id_pelanggan
+            WHERE $where ORDER BY t.tanggal DESC LIMIT $limit OFFSET $offset"
         )->result_array();
         
         $result = [];
@@ -30,10 +33,10 @@ class Riwayat_model extends CI_Model {
 
             $details = $this->db->query(
                 "SELECT dt.*, COALESCE(SUM(r.jumlah_retur),0) as sudah_retur
-                 FROM detail_transaksi dt
-                 LEFT JOIN retur r ON dt.no_transaksi = r.no_transaksi AND dt.nama_barang = r.nama_barang
-                 WHERE dt.no_transaksi = " . $this->db->escape($no) . "
-                 GROUP BY dt.id_detail"
+                FROM detail_transaksi dt
+                LEFT JOIN retur r ON dt.no_transaksi = r.no_transaksi AND dt.nama_barang = r.nama_barang
+                WHERE dt.no_transaksi = " . $this->db->escape($no) . "
+                GROUP BY dt.id_detail"
             )->result_array();
 
             $bisa_retur = false;
@@ -44,7 +47,7 @@ class Riwayat_model extends CI_Model {
                 }
             }
 
-            $batas       = date('Y-m-d', strtotime($tgl . ' +1 day'));
+            $batas        = date('Y-m-d', strtotime($tgl . ' +1 day'));
             $masa_berlaku = (date('Y-m-d') <= $batas);
 
             $row['bisa_retur']   = $bisa_retur;

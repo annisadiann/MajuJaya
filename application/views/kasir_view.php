@@ -16,6 +16,7 @@
     th { padding: 12px; text-align: center; color: white; background: #27ae60; font-size: 14px; }
     td { padding: 12px; border-bottom: 1px solid #eee; font-size: 14px; }
     tr:hover td { background: #f8f9fa; }
+    tr.dipilih td { background: #eafaf1 !important; }
     input[type=number] { width: 90px; padding: 6px 8px; border: 1px solid #ddd; border-radius: 5px; text-align: center; font-size: 14px; }
     .stok-low { color: #e74c3c; font-weight: bold; }
     .total-box { background: #f8f9fa; border-radius: 8px; padding: 12px 18px; text-align: right; margin-top: 15px; font-size: 15px; }
@@ -25,10 +26,10 @@
     .btn-proses:hover { background: #1e8449; }
     .alert-error   { background: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin-bottom: 15px; }
     .alert-success { background: #d4edda; color: #155724; padding: 10px; border-radius: 5px; margin-bottom: 15px; }
-    .pagination { display: flex; gap: 5px; margin-top: 15px; flex-wrap: wrap; }
-    .pagination a { padding: 8px 14px; border: 1px solid #ddd; border-radius: 5px; text-decoration: none; color: #27ae60; font-size: 14px; }
-    .pagination a:hover, .pagination a.active { background: #27ae60; color: white; border-color: #27ae60; }
     .link-riwayat { color: #3498db; text-decoration: none; font-weight: bold; font-size: 14px; }
+    .search-box { margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+    .search-box input { padding: 8px 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; width: 250px; }
+    .search-box input:focus { outline: none; border-color: #27ae60; }
   </style>
 </head>
 <body>
@@ -47,71 +48,183 @@
   <?php if ($error):   ?><div class="alert-error"><?= htmlspecialchars($error) ?></div><?php endif; ?>
   <?php if ($success): ?><div class="alert-success"><?= htmlspecialchars($success) ?></div><?php endif; ?>
 
-  <form action="<?= site_url('kasir/simpan') ?>" method="POST">
+  <div class="search-box">
+    <input type="text" id="search-barang" placeholder="Cari nama barang..."
+      oninput="liveSearch(this.value)">
+    <span id="search-info" style="font-size:13px; color:#888;"></span>
+  </div>
+
+  <form action="<?= site_url('kasir/simpan') ?>" method="POST" id="form-kasir">
   <table>
-    <tr>
-      <th style="text-align:left;">Nama Barang</th>
-      <th>Harga Jual</th>
-      <th>Stok</th>
-      <th>Jumlah Dijual</th>
-      <th>Subtotal</th>
-    </tr>
-    <?php foreach ($barang as $i => $row): ?>
-    <tr>
-      <td><?= htmlspecialchars($row['nama_barang']) ?></td>
-      <td style="text-align:center;">Rp <?= number_format($row['harga_jual'], 0, ',', '.') ?></td>
-      <td style="text-align:center;" class="<?= $row['stok'] < 10 ? 'stok-low' : '' ?>"><?= number_format($row['stok'], 0, ',', '.') ?></td>
-      <td style="text-align:center;">
-        <input type="number"
-               name="jumlah[<?= $row['id_barang'] ?>]"
-               min="0" max="<?= $row['stok'] ?>"
-               value="0"
-               data-harga="<?= $row['harga_jual'] ?>"
-               class="input-jual" id="jual-<?= $i ?>"
-               oninput="hitungTotal()">
-      </td>
-      <td style="text-align:right;" id="sub-<?= $i ?>">-</td>
-    </tr>
-    <?php endforeach; ?>
+    <thead>
+      <tr>
+        <th style="text-align:left;">Nama Barang</th>
+        <th>Harga Jual</th>
+        <th>Stok</th>
+        <th>Jumlah Dijual</th>
+        <th>Subtotal</th>
+      </tr>
+    </thead>
+    <tbody id="tabel-barang">
+      <?php foreach ($barang as $i => $row): ?>
+      <tr data-id="<?= $row['id_barang'] ?>" data-harga="<?= $row['harga_jual'] ?>" data-nama="<?= htmlspecialchars($row['nama_barang']) ?>" data-stok="<?= $row['stok'] ?>">
+        <td><?= htmlspecialchars($row['nama_barang']) ?></td>
+        <td style="text-align:center;">Rp <?= number_format($row['harga_jual'], 0, ',', '.') ?></td>
+        <td style="text-align:center;" class="<?= $row['stok'] < 10 ? 'stok-low' : '' ?>"><?= $row['stok'] ?></td>
+        <td style="text-align:center;">
+          <input type="number" min="0" max="<?= $row['stok'] ?>" value="0"
+                 class="input-jual" oninput="updateKeranjang(this)">
+        </td>
+        <td style="text-align:right;" class="subtotal-cell">-</td>
+      </tr>
+      <?php endforeach; ?>
+    </tbody>
   </table>
+
+  <!-- Hidden inputs untuk submit -->
+  <div id="hidden-inputs"></div>
 
   <div class="total-box">
     Total Transaksi: <span id="total-display">Rp 0</span>
   </div>
 
+  <div style="background:#f8f9fa; border:1px solid #ddd; border-radius:8px; padding:15px 20px; margin-top:15px;">
+    <label style="font-size:13px; font-weight:bold; color:#555; display:block; margin-bottom:8px;">Pelanggan</label>
+    <div>
+      <label style="font-size:12px; color:#666; display:block; margin-bottom:4px;">Pilih Pelanggan</label>
+      <select name="id_pelanggan" id="select-pelanggan" style="padding:7px 10px; border:1px solid #ddd; border-radius:5px; font-size:13px; min-width:220px;" onchange="toggleFormPelanggan(this)">
+        <option value="">-- Tanpa Pelanggan --</option>
+        <option value="baru">+ Tambah Pelanggan Baru</option>
+        <?php foreach ($daftar_pelanggan as $p): ?>
+          <option value="<?= $p['id_pelanggan'] ?>">
+            <?= htmlspecialchars($p['kode_pelanggan'].' - '.$p['nama_pelanggan']) ?>
+          </option>
+        <?php endforeach; ?>
+      </select>
+    </div>
+    <div id="form-pelanggan-baru" style="display:none; margin-top:12px; padding-top:12px; border-top:1px solid #eee;">
+      <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <div>
+          <label style="font-size:12px; color:#666; display:block; margin-bottom:4px;">Nama Pelanggan</label>
+          <input type="text" name="nama_pelanggan_baru" placeholder="Nama pelanggan..."
+            style="padding:7px 10px; border:1px solid #ddd; border-radius:5px; font-size:13px; width:200px;">
+        </div>
+        <div>
+          <label style="font-size:12px; color:#666; display:block; margin-bottom:4px;">Alamat (opsional)</label>
+          <input type="text" name="alamat_baru" placeholder="Alamat..."
+            style="padding:7px 10px; border:1px solid #ddd; border-radius:5px; font-size:13px; width:200px;">
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="footer-bar">
     <a href="<?= site_url('riwayat') ?>" class="link-riwayat">Riwayat Penjualan</a>
-    <button type="submit" class="btn-proses">Proses Penjualan</button>
+    <button type="submit" class="btn-proses" onclick="return siapkanSubmit()">Proses Penjualan</button>
   </div>
   </form>
-
-  <?php if ($total_halaman > 1): ?>
-  <div class="pagination">
-    <?php if ($page > 1): ?>
-      <a href="<?= site_url('kasir?page='.($page-1)) ?>">« Prev</a>
-    <?php endif; ?>
-    <?php for ($i = 1; $i <= $total_halaman; $i++): ?>
-      <a href="<?= site_url('kasir?page='.$i) ?>" class="<?= $i == $page ? 'active' : '' ?>"><?= $i ?></a>
-    <?php endfor; ?>
-    <?php if ($page < $total_halaman): ?>
-      <a href="<?= site_url('kasir?page='.($page+1)) ?>">Next »</a>
-    <?php endif; ?>
-  </div>
-  <?php endif; ?>
 </div>
 
 <script>
+const AJAX_URL = '<?= site_url('kasir/ajax_search') ?>';
+const keranjang = {}; // { id_barang: { jumlah, harga, nama, stok } }
+
+function liveSearch(val) {
+  clearTimeout(window._st);
+  window._st = setTimeout(function() {
+    fetch(AJAX_URL + '?search=' + encodeURIComponent(val))
+      .then(r => r.json())
+      .then(data => renderTabel(data));
+    document.getElementById('search-info').textContent = val ? '' : '';
+  }, 300);
+}
+
+function renderTabel(barang) {
+  const tbody = document.getElementById('tabel-barang');
+  if (barang.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#888;padding:30px;">Barang tidak ditemukan.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = barang.map((row, i) => {
+    const id     = row.id_barang;
+    const jumlah = keranjang[id] ? keranjang[id].jumlah : 0;
+    const sub    = jumlah > 0 ? 'Rp ' + (jumlah * row.harga_jual).toLocaleString('id-ID') : '-';
+    const dipilih = jumlah > 0 ? 'dipilih' : '';
+    const stokLow = row.stok < 10 ? 'stok-low' : '';
+    return `<tr class="${dipilih}" data-id="${id}" data-harga="${row.harga_jual}" data-nama="${row.nama_barang}" data-stok="${row.stok}">
+      <td>${row.nama_barang}</td>
+      <td style="text-align:center;">Rp ${parseInt(row.harga_jual).toLocaleString('id-ID')}</td>
+      <td style="text-align:center;" class="${stokLow}">${row.stok}</td>
+      <td style="text-align:center;">
+        <input type="number" min="0" max="${row.stok}" value="${jumlah}"
+               class="input-jual" oninput="updateKeranjang(this)">
+      </td>
+      <td style="text-align:right;" class="subtotal-cell">${sub}</td>
+    </tr>`;
+  }).join('');
+  hitungTotal();
+}
+
+function updateKeranjang(input) {
+  const tr     = input.closest('tr');
+  const id     = tr.dataset.id;
+  const harga  = parseInt(tr.dataset.harga);
+  const nama   = tr.dataset.nama;
+  const stok   = parseInt(tr.dataset.stok);
+  const jumlah = Math.min(parseInt(input.value) || 0, stok);
+  input.value  = jumlah;
+
+  if (jumlah > 0) {
+    keranjang[id] = { jumlah, harga, nama, stok };
+    tr.classList.add('dipilih');
+  } else {
+    delete keranjang[id];
+    tr.classList.remove('dipilih');
+  }
+  hitungTotal();
+}
+
 function hitungTotal() {
   let total = 0;
-  document.querySelectorAll('.input-jual').forEach(function(input, i) {
-    const qty   = parseInt(input.value) || 0;
-    const harga = parseInt(input.dataset.harga) || 0;
-    const sub   = qty * harga;
-    total      += sub;
-    const subEl = document.getElementById('sub-' + i);
-    if (subEl) subEl.textContent = qty > 0 ? 'Rp ' + sub.toLocaleString('id-ID') : '-';
+  document.querySelectorAll('#tabel-barang tr').forEach(tr => {
+    const id    = tr.dataset.id;
+    const input = tr.querySelector('.input-jual');
+    const subEl = tr.querySelector('.subtotal-cell');
+    if (!input || !subEl) return;
+    const jumlah = parseInt(input.value) || 0;
+    const harga  = parseInt(tr.dataset.harga) || 0;
+    const sub    = jumlah * harga;
+    total += sub;
+    subEl.textContent = jumlah > 0 ? 'Rp ' + sub.toLocaleString('id-ID') : '-';
+  });
+  // tambah dari keranjang yang tidak tampil
+  Object.keys(keranjang).forEach(id => {
+    const adaDiTabel = document.querySelector(`#tabel-barang tr[data-id="${id}"]`);
+    if (!adaDiTabel) total += keranjang[id].jumlah * keranjang[id].harga;
   });
   document.getElementById('total-display').textContent = 'Rp ' + total.toLocaleString('id-ID');
+}
+
+function siapkanSubmit() {
+  if (Object.keys(keranjang).length === 0) {
+    alert('Pilih minimal 1 barang!');
+    return false;
+  }
+  const container = document.getElementById('hidden-inputs');
+  container.innerHTML = '';
+  Object.keys(keranjang).forEach(id => {
+    const input = document.createElement('input');
+    input.type  = 'hidden';
+    input.name  = 'jumlah[' + id + ']';
+    input.value = keranjang[id].jumlah;
+    container.appendChild(input);
+  });
+  return true;
+}
+
+function toggleFormPelanggan(select) {
+  document.getElementById('form-pelanggan-baru').style.display =
+    select.value === 'baru' ? 'block' : 'none';
 }
 </script>
 </body>

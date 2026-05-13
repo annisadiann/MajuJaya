@@ -84,18 +84,27 @@
     <tr>
       <th>No. Transaksi</th>
       <th>Tanggal</th>
+      <th>Pelanggan</th>
       <th>Jumlah Item</th>
       <th>Total Harga</th>
       <th>Aksi</th>
     </tr>
     <?php if (empty($transaksi)): ?>
-      <tr><td colspan="5" style="text-align:center; color:#888; padding:30px;">Tidak ada transaksi ditemukan.</td></tr>
+      <tr><td colspan="6" style="text-align:center; color:#888; padding:30px;">Tidak ada transaksi ditemukan.</td></tr>
     <?php else: ?>
       <?php foreach ($transaksi as $row): ?>
       <tr>
         <td><?= htmlspecialchars($row['no_transaksi']) ?></td>
-        <td><?= $row['tanggal'] ?></td>
-        <td><?= $row['jumlah'] ?> item</td>
+          <td><?= $row['tanggal'] ?></td>
+          <td>
+            <?php if ($row['nama_pelanggan']): ?>
+              <span style="font-size:12px; color:#888;"><?= htmlspecialchars($row['kode_pelanggan']) ?></span><br>
+              <?= htmlspecialchars($row['nama_pelanggan']) ?>
+            <?php else: ?>
+              <span style="color:#aaa; font-size:13px;">-</span>
+            <?php endif; ?>
+          </td>
+          <td><?= $row['jumlah'] ?> item</td>
         <td class="total-cell">Rp <?= number_format($row['total_harga'], 0, ',', '.') ?></td>
         <td>
           <a href="<?= site_url('invoice?no='.urlencode($row['no_transaksi'])) ?>" class="btn-detail">Invoice</a>

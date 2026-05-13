@@ -16,12 +16,15 @@ class Barang extends CI_Controller {
         $totalHalaman = ceil($total / $limit) ?: 1;
         $offset       = ($page - 1) * $limit;
 
-        $data['rows']         = $this->Barang_model->get_barang($limit, $offset);
-        $data['page']         = $page;
-        $data['totalHalaman'] = $totalHalaman;
-        $data['nama']         = $this->session->userdata('nama');
-        $data['role']         = $this->session->userdata('role');
-        $data['activeTab']    = $this->input->get('tab') ?? 'pembelian';
+        $this->load->model('Pelanggan_model');
+
+        $data['rows']             = $this->Barang_model->get_barang($limit, $offset);
+        $data['page']             = $page;
+        $data['totalHalaman']     = $totalHalaman;
+        $data['nama']             = $this->session->userdata('nama');
+        $data['role']             = $this->session->userdata('role');
+        $data['activeTab']        = $this->input->get('tab') ?? 'pembelian';
+        $data['daftar_pelanggan'] = $this->Pelanggan_model->get_all();
 
         $this->load->view('barang/index', $data);
     }
@@ -89,8 +92,24 @@ class Barang extends CI_Controller {
                 redirect('barang?tab=penjualan');
             }
         }
+
+        $this->load->model('Pelanggan_model');
+        $id_pelanggan = $this->input->post('id_pelanggan');
+
+        if ($id_pelanggan === 'baru') {
+            $nama_baru  = trim($this->input->post('nama_pelanggan_baru'));
+            $alamat_baru = trim($this->input->post('alamat_baru') ?? '');
+            if ($nama_baru === '') {
+                $this->session->set_flashdata('error', 'Nama pelanggan baru tidak boleh kosong!');
+                redirect('barang?tab=penjualan');
+            }
+            $id_pelanggan = $this->Pelanggan_model->simpan($nama_baru, $alamat_baru);
+        } elseif ($id_pelanggan === '') {
+            $id_pelanggan = null; 
+        }
+
         $this->load->model('Kasir_model');
-        $result = $this->Kasir_model->simpan_transaksi($jumlah_beli);
+        $result = $this->Kasir_model->simpan_transaksi($jumlah_beli, $id_pelanggan);
         $this->session->set_userdata('transaksi_sukses', [
             'no_transaksi'  => $result['no_transaksi'],
             'detail_barang' => $result['detail_barang'],

@@ -8,10 +8,14 @@ class Retur_model extends CI_Model {
     }
 
     public function get_retur($limit, $offset) {
-        return $this->db->order_by('tanggal_retur', 'DESC')
-                        ->limit($limit, $offset)
-                        ->get('retur')
-                        ->result_array();
+        return $this->db->query("
+            SELECT r.*, p.nama_pelanggan, p.kode_pelanggan
+            FROM retur r
+            LEFT JOIN transaksi t ON r.no_transaksi = t.no_transaksi
+            LEFT JOIN pelanggan p ON t.id_pelanggan = p.id_pelanggan
+            ORDER BY r.tanggal_retur DESC
+            LIMIT $limit OFFSET $offset
+        ")->result_array();
     }
 
     public function get_grand_total() {

@@ -40,6 +40,7 @@
     <tr>
       <th>No. Retur</th>
       <th>No. Transaksi</th>
+      <th>Pelanggan</th>
       <th>Tanggal Retur</th>
       <th>Nama Barang</th>
       <th>Jumlah Retur</th>
@@ -47,12 +48,20 @@
       <th>Total Pengembalian</th>
     </tr>
     <?php if (empty($retur)): ?>
-      <tr><td colspan="7" class="empty">Belum ada retur.</td></tr>
+      <tr><td colspan="8" class="empty">Belum ada retur.</td></tr>
     <?php else: ?>
       <?php foreach ($retur as $row): ?>
       <tr>
         <td><?= htmlspecialchars($row['no_retur']) ?></td>
         <td><?= htmlspecialchars($row['no_transaksi']) ?></td>
+        <td>
+          <?php if (!empty($row['nama_pelanggan'])): ?>
+            <span style="font-size:12px; color:#888;"><?= htmlspecialchars($row['kode_pelanggan']) ?></span><br>
+            <?= htmlspecialchars($row['nama_pelanggan']) ?>
+          <?php else: ?>
+            <span style="color:#aaa; font-size:13px;">-</span>
+          <?php endif; ?>
+        </td>
         <td><?= $row['tanggal_retur'] ?></td>
         <td><?= htmlspecialchars($row['nama_barang']) ?></td>
         <td><?= $row['jumlah_retur'] ?></td>
